@@ -1,0 +1,45 @@
+﻿@page "/income"
+
+<h3>Income</h3>
+<div>
+    <label for="amount">Amount:</label>
+    <input type="number" placeholder="Enter the amount" @bind="_amount" required />
+
+    <label for="source">Source:</label>
+    <input type="text" @bind="_source" required />
+
+    <label for="date">Date:</label>
+    <input type="date" @bind="_date" required />
+
+    <label for="tags">Tags:</label>
+    <input type="text" @bind="_tags" />
+
+    <label for="desc">Note:</label>
+    <textarea placeholder="Enter your note" @bind="_note"></textarea>
+
+    <label for="type">Type</label>
+    <select @bind="_type">
+        @foreach (var type in Enum.GetNames(typeof(IncomeType)))
+        {
+            <option value="@type">@type</option>
+        }
+    </select>
+
+    <button @onclick="AddUserIncome">Add income</button>
+
+</div>
+@code {
+    public int _amount;
+    public String _source;
+    public DateOnly _date;
+    public String _tags;
+    public String _note;
+    public IncomeType _type;
+
+    DatabaseValueInsertion databaseValueInsertion = new DatabaseValueInsertion();
+    public void AddUserIncome()
+    {
+        databaseValueInsertion.InsertIncome(_amount, _source, _date, _tags, _note, _type);
+        databaseValueInsertion.UpdateUserBalance(1, _amount);
+    }
+}
