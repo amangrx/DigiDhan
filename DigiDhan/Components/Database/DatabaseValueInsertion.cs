@@ -43,11 +43,40 @@ public class DatabaseValueInsertion
 
         return (int)lastInsertId;
     }
+
+    public void InsertExpense(int amount, string source, DateOnly date, string tags, string note, ExpenseType type)
+    {
+        string insertExpenseQuery = "INSERT INTO expenses (exp_amount, exp_source, exp_date, tags, note, exp_type) VALUES (@amount, @source, @date, @tags, @note, @type)";
+        using (var cmd = new SQLiteCommand(insertExpenseQuery, conn))
+        {
+            cmd.Parameters.AddWithValue("@amount", amount);
+            cmd.Parameters.AddWithValue("@source", source);
+            cmd.Parameters.AddWithValue("@date", date);
+            cmd.Parameters.AddWithValue("@tags", tags);
+            cmd.Parameters.AddWithValue("@note", note);
+            cmd.Parameters.AddWithValue("@type", type);
+            cmd.ExecuteNonQuery();
+        }
+    }
+
+
+
     public void UpdateUserBalance(int userId, int amount)
     {
         string updateUserBalanceQuery = "UPDATE users SET balance = balance + @amount WHERE user_id = @userId";
 
         using (var cmd = new SQLiteCommand(updateUserBalanceQuery, conn))
+        {
+            cmd.Parameters.AddWithValue("@userId", userId);
+            cmd.Parameters.AddWithValue("@amount", amount);
+            cmd.ExecuteNonQuery();
+        }
+    }
+
+    public void DeductUserBalance(int userId, int amount)
+    {
+        string deductUserBalanceQuery = "UPDATE users SET balance = balance - @amount WHERE user_id = @userId";
+        using (var cmd = new SQLiteCommand(deductUserBalanceQuery, conn))
         {
             cmd.Parameters.AddWithValue("@userId", userId);
             cmd.Parameters.AddWithValue("@amount", amount);

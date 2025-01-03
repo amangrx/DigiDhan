@@ -1,0 +1,55 @@
+﻿@page "/expenses"
+
+<h3>Expenses</h3>
+<div>
+    <label for="amount">Amount:</label>
+    <input type="number" placeholder="Enter the amount" @bind="amount" required />
+
+    <label for="source">Source:</label>
+    <input type="text" @bind="source" required />
+
+    <label for="date">Date:</label>
+    <input type="date" @bind="date" required />
+
+    <label for="tags">Tags:</label>
+    <input type="text" @bind="tags" />
+
+    <label for="desc">Note:</label>
+    <textarea placeholder="Enter your note" @bind="note"></textarea>
+
+    <label for="type">Type</label>
+    <select @bind="type">
+        @foreach (var type in Enum.GetNames(typeof(ExpenseType)))
+        {
+            <option value="@type">@type</option>
+        }
+    </select>
+
+    <button @onclick="AddUserExpense">Add expense</button>
+
+</div>
+@code {
+    public int amount;
+    public String source;
+    public DateOnly date;
+    public String tags;
+    public String note;
+    public ExpenseType type;
+
+    DatabaseValueInsertion databaseValueInsertion = new DatabaseValueInsertion();
+
+    public void AddUserExpense()
+    {
+        DatabaseExtraction databaseExtraction = new DatabaseExtraction();
+        if(databaseExtraction.GetUserBalance(1) >= amount)
+        {
+            databaseValueInsertion.InsertExpense(amount, source, date, tags, note, type);
+            databaseValueInsertion.DeductUserBalance(1, amount);
+        }
+        else
+        {
+            Console.WriteLine("Not enough balance.");
+        }
+
+    }
+}

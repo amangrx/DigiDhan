@@ -41,7 +41,18 @@ public class DatabaseConnection
                 note TEXT NOT NULL,
                 type TEXT NOT NULL
             );";
-             
+
+        string createExpenseTableQuery = @"
+            CREATE TABLE expenses (
+                exp_id INTEGER PRIMARY KEY AUTOINCREMENT,
+				exp_amount INTEGER NOT NULL,
+				exp_source TEXT NOT NULL,
+				exp_date DATE NOT NULL,
+				tags TEXT NOT NULL,
+                note TEXT NOT NULL,
+                exp_type TEXT NOT NULL
+            );";
+
         using (SQLiteConnection conn = new SQLiteConnection(connectionDB))
         {
             conn.Open();
@@ -56,42 +67,12 @@ public class DatabaseConnection
                 cmd.ExecuteNonQuery();
             }
 
+            using (SQLiteCommand cmd = new SQLiteCommand(createExpenseTableQuery, conn))
+            {
+                cmd.ExecuteNonQuery();
+            }
             conn.Close();
         }
     }
 
-    //public void DeleteTable()
-    //{
-    //    string dropUserQuery = "DROP TABLE user;";
-    //    string dropInflowQuery = "DROP TABLE inflow;";
-    //    string dropOutflowQuery = "DROP TABLE outflow;";
-    //    string dropDebtQuery = "DROP TABLE debt;";
-
-    //    using (SQLiteConnection connection = new SQLiteConnection(connectionString))
-    //    {
-    //        connection.Open();
-
-    //        using (SQLiteCommand command = new SQLiteCommand(dropUserQuery, connection))
-    //        {
-    //            command.ExecuteNonQuery();
-    //        }
-
-    //        using (SQLiteCommand command = new SQLiteCommand(dropInflowQuery, connection))
-    //        {
-    //            command.ExecuteNonQuery();
-    //        }
-
-    //        using (SQLiteCommand command = new SQLiteCommand(dropOutflowQuery, connection))
-    //        {
-    //            command.ExecuteNonQuery();
-    //        }
-
-    //        using (SQLiteCommand command = new SQLiteCommand(dropDebtQuery, connection))
-    //        {
-    //            command.ExecuteNonQuery();
-    //        }
-
-    //        connection.Close();
-    //    }
-    //}
 }
