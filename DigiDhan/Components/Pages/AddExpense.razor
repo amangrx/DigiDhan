@@ -28,6 +28,11 @@
     <button @onclick="AddUserExpense">Add expense</button>
 
 </div>
+@if (!string.IsNullOrEmpty(message))
+{
+    <div class="message">@message</div>
+}
+
 @code {
     public int amount;
     public String source;
@@ -35,6 +40,8 @@
     public String tags;
     public String note;
     public ExpenseType type;
+
+    public string message;
 
     DatabaseValueInsertion databaseValueInsertion = new DatabaseValueInsertion();
 
@@ -45,10 +52,11 @@
         {
             databaseValueInsertion.InsertExpense(amount, source, date, tags, note, type);
             databaseValueInsertion.DeductUserBalance(1, amount);
+            message = "Expense recorded successfully.";
         }
         else
         {
-            Console.WriteLine("Not enough balance.");
+            message = "Not enough balance.";
         }
 
     }

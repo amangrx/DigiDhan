@@ -1,0 +1,53 @@
+﻿@page "/debt"
+
+<h3>Debt</h3>
+<div>
+    <label for="amount">Amount:</label>
+    <input type="number" placeholder="Enter the amount" @bind="debtAmount" required />
+
+    <label for="source">Source:</label>
+    <input type="text" @bind="debtSource" required />
+
+    <label for="date">Date:</label>
+    <input type="date" @bind="debtDate" required />
+
+    <label for="dueDate">Due Date:</label>
+    <input type="date" @bind="debtDueDate" required />
+
+    <label for="tags">Tags:</label>
+    <input type="text" @bind="tags" />
+
+    <label for="desc">Note:</label>
+    <textarea placeholder="Enter your note" @bind="note"></textarea>
+
+    <label for="type">Type</label>
+    <select @bind="debtType">
+        @foreach (var type in Enum.GetNames(typeof(DebtType)))
+        {
+            <option value="@type">@type</option>
+        }
+    </select>
+
+    <button @onclick="AddUserDebt">Add debt</button>
+
+</div>
+
+
+@code {
+    public int debtAmount;
+    public String debtSource;
+    public DateOnly debtDate;
+    public DateOnly debtDueDate;
+    public String tags;
+    public String note;
+    public DebtType debtType;
+
+
+    DatabaseValueInsertion databaseValueInsertion = new DatabaseValueInsertion();
+
+    public void AddUserDebt()
+    {
+        databaseValueInsertion.InsertDebt(debtAmount, debtSource, debtDate, debtDueDate, tags, note, debtType);
+        databaseValueInsertion.UpdateUserBalance(1, debtAmount);
+    }
+}

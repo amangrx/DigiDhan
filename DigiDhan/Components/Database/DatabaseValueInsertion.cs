@@ -58,7 +58,21 @@ public class DatabaseValueInsertion
             cmd.ExecuteNonQuery();
         }
     }
-
+    public void InsertDebt(int amount, string source, DateOnly date, DateOnly dueDate, string tags, string note, DebtType debtType)
+    {
+        string insertDebtQuery = "INSERT INTO debt (debt_amount, debt_source, debt_date, due_date, tags, note, debt_type) VALUES (@amount, @source, @date, @dueDate, @tags, @note, @type)";
+        using (var cmd = new SQLiteCommand(insertDebtQuery, conn))
+        {
+            cmd.Parameters.AddWithValue("@amount", amount);
+            cmd.Parameters.AddWithValue("@source", source);
+            cmd.Parameters.AddWithValue("@date", date);
+            cmd.Parameters.AddWithValue("@dueDate", dueDate);
+            cmd.Parameters.AddWithValue("@tags", tags);
+            cmd.Parameters.AddWithValue("@note", note);
+            cmd.Parameters.AddWithValue("@type", debtType);
+            cmd.ExecuteNonQuery();
+        }
+    }
 
 
     public void UpdateUserBalance(int userId, int amount)

@@ -38,7 +38,7 @@ public class DatabaseConnection
 				source TEXT NOT NULL,
 				date DATE NOT NULL,
 				tags TEXT NOT NULL,
-                note TEXT NOT NULL,
+                note TEXT NULL,
                 type TEXT NOT NULL
             );";
 
@@ -49,8 +49,20 @@ public class DatabaseConnection
 				exp_source TEXT NOT NULL,
 				exp_date DATE NOT NULL,
 				tags TEXT NOT NULL,
-                note TEXT NOT NULL,
+                note TEXT NULL,
                 exp_type TEXT NOT NULL
+            );";
+
+        string createDebtTableQuery = @"
+            CREATE TABLE debt (
+                debt_id INTEGER PRIMARY KEY AUTOINCREMENT,
+				debt_amount INTEGER NOT NULL,
+				debt_source TEXT NOT NULL,
+				debt_date DATE NOT NULL,
+                due_date DATE NOT NULL,
+				tags TEXT NOT NULL,
+                note TEXT NULL,
+                debt_type TEXT NOT NULL
             );";
 
         using (SQLiteConnection conn = new SQLiteConnection(connectionDB))
@@ -68,6 +80,11 @@ public class DatabaseConnection
             }
 
             using (SQLiteCommand cmd = new SQLiteCommand(createExpenseTableQuery, conn))
+            {
+                cmd.ExecuteNonQuery();
+            }
+
+            using (SQLiteCommand cmd = new SQLiteCommand(createDebtTableQuery, conn))
             {
                 cmd.ExecuteNonQuery();
             }
