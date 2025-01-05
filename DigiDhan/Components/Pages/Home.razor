@@ -1,6 +1,7 @@
 ﻿@page "/home"
 
 <h1>Digi Dhan</h1>
+<p> Total Transaction: @totalNumberTransaction</p>
 <p> Current Balance: @currentBalance</p>
 <div class="cards-container">
     <div class="card">
@@ -91,6 +92,7 @@
     private int lowestExpense = 0;
     private int highestDebt = 0;
     private int lowestDebt = 0;
+    private int totalNumberTransaction;
 
     public void SortByDate()
     {
@@ -99,12 +101,13 @@
 
     protected override async Task OnInitializedAsync()
     {
-        transaction = databaseExtraction.GetTransactions();  // Get all transactions
+        transaction = databaseExtraction.GetTransactions(); 
+        totalNumberTransaction = databaseExtraction.GetNumberTransaction();
         currentBalance = databaseExtraction.GetUserBalance(1);
         FetchHighestAndLowestValues();
     }
 
-    private async Task FetchHighestAndLowestValues()
+    private void FetchHighestAndLowestValues()
     {
         highestIncome = databaseExtraction.GetHighest("incomes");
         lowestIncome = databaseExtraction.GetLowest("incomes");

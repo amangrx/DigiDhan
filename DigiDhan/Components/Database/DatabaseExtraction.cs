@@ -33,6 +33,37 @@ public class DatabaseExtraction
         }
     }
 
+    public int GetNumberTransaction()
+    {
+        int totalNumberOfTransaction = 0;
+
+        string getNumberIncome = "SELECT COUNT(*) FROM incomes";
+        string getNumberExpense = "SELECT COUNT(*) FROM expenses";
+        string getNumberDebt = "SELECT COUNT(*) FROM debt";
+
+        // For incomes
+        using (var cmd = new SQLiteCommand(getNumberIncome, conn))
+        {
+            totalNumberOfTransaction += Convert.ToInt32(cmd.ExecuteScalar());
+        }
+
+        // For expenses
+        using (var cmd = new SQLiteCommand(getNumberExpense, conn))
+        {
+            totalNumberOfTransaction += Convert.ToInt32(cmd.ExecuteScalar());
+        }
+
+        // For debts
+        using (var cmd = new SQLiteCommand(getNumberDebt, conn))
+        {
+            totalNumberOfTransaction += Convert.ToInt32(cmd.ExecuteScalar());
+        }
+
+        return totalNumberOfTransaction;
+    }
+
+
+
     public List<Transaction> GetTransactions()
     {
         List<Transaction> transactions = new List<Transaction>();
