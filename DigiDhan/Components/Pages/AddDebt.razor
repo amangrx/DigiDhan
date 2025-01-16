@@ -15,7 +15,13 @@
     <input type="date" @bind="debtDueDate" required />
 
     <label for="tags">Tags:</label>
-    <input type="text" @bind="tags" />
+    <select @bind="tags">
+        <option value="">-- Select a Tag --</option>
+        @foreach (var tag in tagsList)
+        {
+            <option value="@tag">@tag</option>
+        }
+    </select>
 
     <label for="desc">Note:</label>
     <textarea placeholder="Enter your note" @bind="note"></textarea>
@@ -41,13 +47,19 @@
     public String tags;
     public String note;
     public DebtType debtType;
+    private List<string> tagsList = new();
 
-
+    TagManagement tagManagement = new TagManagement();
     DatabaseValueInsertion databaseValueInsertion = new DatabaseValueInsertion();
 
     public void AddUserDebt()
     {
         databaseValueInsertion.InsertDebt(debtAmount, debtSource, debtDate, debtDueDate, tags, note, debtType);
         databaseValueInsertion.UpdateUserBalance(1, debtAmount);
+    }
+
+    protected override void OnInitialized()
+    {
+        tagsList = tagManagement.GetTagList();
     }
 }

@@ -8,19 +8,41 @@
         <h2>Income</h2>
         <p>Highest: @highestIncome</p>
         <p>Lowest: @lowestIncome</p>
+        <hr />
+        <p>Total:@totalIncome</p>
     </div>
     <div class="card">
         <h2>Expense</h2>
         <p>Highest: @highestExpense</p>
         <p>Lowest: @lowestExpense</p>
+        <hr />
+        <p>Total:@totalExpense </p>
     </div>
     <div class="card">
         <h2>Debt</h2>
         <p>Highest: @highestDebt</p>
         <p>Lowest: @lowestDebt</p>
+        <hr />
+        <p>Remaining Debt:@totalPendingDebt </p>
+        <p>Cleared Debt @totalClearedDebt</p>
+        <p>Total: @totalDebt</p>
     </div>
 </div>
+
 <button class="submit-btn" @onclick="SortByDate" type="submit">Sort Date</button>
+<p>@searchByDateFrom</p>
+<p>@searchByDateTo</p>
+<!--For specifying transactions of certain date-->
+<div>
+    <label>From: </label>
+    <input type="date" @bind="searchByDateFrom" />
+</div>
+<div>
+    <label>To: </label>
+    <input type="date" @bind="searchByDateTo" />
+</div>
+<button class="submit-btn" @onclick="SpecifyByDate" type="submit">Search</button>
+
 <style>
     .cards-container {
         display: flex;
@@ -62,7 +84,8 @@
             <th>Source</th>
             <th>Date</th>
             <th>Tags</th>
-            <th>Note</th> <!-- New column for the note -->
+            <th>Note</th>
+            <th>Type</th>
         </tr>
     </thead>
     <tbody>
@@ -74,12 +97,32 @@
                 <td>@transaction.source</td>
                 <td>@transaction.dateOfTransaction</td>
                 <td>@transaction.tags</td>
-                <td>@transaction.note</td> <!-- Display the note -->
+                <td>@transaction.note</td>
+                <td>
+                    @if (transaction.category == "Income")
+                    {
+                        @transaction.incomeType
+                    }
+                    else if (transaction.category == "Expense")
+                    {
+                        @transaction.expenseType
+                    }
+                    else
+                    {
+                        @if (transaction.debtType == DebtType.Pending)
+                        {
+                            <span style="background-color: red; color: white; padding: 5px;">@transaction.debtType.ToString()</span>
+                        }
+                        else
+                        {
+                            <span style="background-color: darkgreen; color: white; padding: 5px;">@transaction.debtType.ToString()</span>
+                        }
+                    }
+                </td>
             </tr>
         }
     </tbody>
 </table>
-
 
 
 @code {
@@ -94,17 +137,34 @@
     private int lowestDebt = 0;
     private int totalNumberTransaction;
 
+    private int totalIncome = 0;
+    private int totalExpense = 0;
+    private int totalDebt = 0;
+
+    private int totalPendingDebt = 0;
+    private int totalClearedDebt = 0;
+
+    // variable for dashboard filtering by specific date range.
+    private DateOnly searchByDateFrom;
+    private DateOnly searchByDateTo;
+
     public void SortByDate()
     {
         transaction = databaseExtraction.SortByDate();
     }
 
+    public void SpecifyByDate()
+    {
+        transaction = databaseExtraction.SearchBySpecificDateRange(searchByDateFrom, searchByDateTo);
+    }
+
     protected override async Task OnInitializedAsync()
     {
-        transaction = databaseExtraction.GetTransactions(); 
+        transaction = databaseExtraction.GetTransactions();
         totalNumberTransaction = databaseExtraction.GetNumberTransaction();
         currentBalance = databaseExtraction.GetUserBalance(1);
         FetchHighestAndLowestValues();
+        FetchTotal();
     }
 
     private void FetchHighestAndLowestValues()
@@ -118,4 +178,14 @@
         highestDebt = databaseExtraction.GetHighest("debt");
         lowestDebt = databaseExtraction.GetLowest("debt");
     }
+
+    private void FetchTotal()
+    {
+        totalIncome = databaseExtraction.GetTotal("incomes");
+        totalExpense = databaseExtraction.GetTotal("expenses");
+        totalDebt = databaseExtraction.GetTotal("debt");
+        totalPendingDebt = databaseExtraction.GetPendingAndClearedTotal("Pending");
+        totalClearedDebt = databaseExtraction.GetPendingAndClearedTotal("Cleared");
+    }
+
 }

@@ -57,12 +57,19 @@ public class DatabaseConnection
             CREATE TABLE debt (
                 debt_id INTEGER PRIMARY KEY AUTOINCREMENT,
 				debt_amount INTEGER NOT NULL,
+                outstanding_amt INTEGER NOT NULL, 
 				debt_source TEXT NOT NULL,
 				debt_date DATE NOT NULL,
                 due_date DATE NOT NULL,
 				tags TEXT NOT NULL,
                 note TEXT NULL,
                 debt_type TEXT NOT NULL
+            );";
+
+        string createTagTableQuery = @"
+            CREATE TABLE tags(
+                tag_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                tag_name TEXT NOT NULL
             );";
 
         using (SQLiteConnection conn = new SQLiteConnection(connectionDB))
@@ -85,6 +92,11 @@ public class DatabaseConnection
             }
 
             using (SQLiteCommand cmd = new SQLiteCommand(createDebtTableQuery, conn))
+            {
+                cmd.ExecuteNonQuery();
+            }
+
+            using (SQLiteCommand cmd = new SQLiteCommand(createTagTableQuery, conn))
             {
                 cmd.ExecuteNonQuery();
             }

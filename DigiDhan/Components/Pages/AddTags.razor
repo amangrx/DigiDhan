@@ -1,0 +1,26 @@
+﻿@page "/tags"
+<h3>AddTags</h3>
+<div>
+    <div>
+        <label for="tags">
+            Tag name:
+        </label>
+        <input type="text" @bind="_tagName" placeholder="Enter the tag name" required />
+    </div>
+    <div>
+        <button @onclick="CreateCustomTag">
+            Add tag
+        </button>
+    </div>
+</div>
+
+@code {
+    public string _tagName;
+
+    private DatabaseValueInsertion databaseValueInsertion = new DatabaseValueInsertion();
+
+    public void CreateCustomTag()
+    {
+        databaseValueInsertion.InsertTags(_tagName); 
+    }
+}

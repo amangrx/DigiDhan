@@ -35,6 +35,7 @@
 
     public void CheckLogin()
     {
+        Console.WriteLine("ahohoho");
         if (username.Equals("amngrx") && password.Equals("aman123"))
         {
             // UserLogin.isLoggedIn = true; 
@@ -46,6 +47,7 @@
 
             //Navigating to home page. 
             NavManager.NavigateTo("/home");
+            StateHasChanged();
         }
         else
         {

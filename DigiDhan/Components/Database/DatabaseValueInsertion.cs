@@ -25,7 +25,7 @@ public class DatabaseValueInsertion
         }
     }
 
-    //function to insert the values of income to th edatabase. 
+    //function to insert the values of income to the database. 
     public int InsertIncome(int amount, string source, DateOnly date, string tags, string note, IncomeType type)
     {
         string insertIncomeQuery = "INSERT INTO incomes (amount, source, date, tags, note, type) VALUES (@amount, @source, @date, @tags, @note, @type)";
@@ -33,10 +33,10 @@ public class DatabaseValueInsertion
         {
             cmd.Parameters.AddWithValue("@amount", amount);
             cmd.Parameters.AddWithValue("@source", source);
-            cmd.Parameters.AddWithValue("@date", date);
+            cmd.Parameters.AddWithValue("@date", date.ToString("yyyy-MM-dd"));
             cmd.Parameters.AddWithValue("@tags", tags);
             cmd.Parameters.AddWithValue("@note", note);
-            cmd.Parameters.AddWithValue("@type", type);
+            cmd.Parameters.AddWithValue("@type", type.ToString());
             cmd.ExecuteNonQuery();
         }
         long lastInsertId = conn.LastInsertRowId;
@@ -51,25 +51,36 @@ public class DatabaseValueInsertion
         {
             cmd.Parameters.AddWithValue("@amount", amount);
             cmd.Parameters.AddWithValue("@source", source);
-            cmd.Parameters.AddWithValue("@date", date);
+            cmd.Parameters.AddWithValue("@date", date.ToString("yyyy-MM-dd"));
             cmd.Parameters.AddWithValue("@tags", tags);
             cmd.Parameters.AddWithValue("@note", note);
-            cmd.Parameters.AddWithValue("@type", type);
+            cmd.Parameters.AddWithValue("@type", type.ToString());
             cmd.ExecuteNonQuery();
         }
     }
     public void InsertDebt(int amount, string source, DateOnly date, DateOnly dueDate, string tags, string note, DebtType debtType)
     {
-        string insertDebtQuery = "INSERT INTO debt (debt_amount, debt_source, debt_date, due_date, tags, note, debt_type) VALUES (@amount, @source, @date, @dueDate, @tags, @note, @type)";
+        string insertDebtQuery = "INSERT INTO debt (debt_amount, outstanding_amt, debt_source, debt_date, due_date, tags, note, debt_type) VALUES (@amount, @outstanding_amt, @source, @date, @dueDate, @tags, @note, @type)";
         using (var cmd = new SQLiteCommand(insertDebtQuery, conn))
         {
             cmd.Parameters.AddWithValue("@amount", amount);
+            cmd.Parameters.AddWithValue("@outstanding_amt", amount);
             cmd.Parameters.AddWithValue("@source", source);
-            cmd.Parameters.AddWithValue("@date", date);
-            cmd.Parameters.AddWithValue("@dueDate", dueDate);
+            cmd.Parameters.AddWithValue("@date", date.ToString("yyyy-MM-dd"));
+            cmd.Parameters.AddWithValue("@dueDate", dueDate.ToString("yyyy-MM-dd"));
             cmd.Parameters.AddWithValue("@tags", tags);
             cmd.Parameters.AddWithValue("@note", note);
-            cmd.Parameters.AddWithValue("@type", debtType);
+            cmd.Parameters.AddWithValue("@type", debtType.ToString());
+            cmd.ExecuteNonQuery();
+        }
+    }
+
+    public void InsertTags(string tag_name)
+    {
+        string insertTagQuery = "INSERT INTO tags(tag_name) VALUES (@tag_name)";
+        using (var cmd = new SQLiteCommand(insertTagQuery, conn))
+        {
+            cmd.Parameters.AddWithValue("@tag_name", tag_name);
             cmd.ExecuteNonQuery();
         }
     }

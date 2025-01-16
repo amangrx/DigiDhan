@@ -12,7 +12,13 @@
     <input type="date" @bind="date" required />
 
     <label for="tags">Tags:</label>
-    <input type="text" @bind="tags" />
+    <select @bind="tags">
+        <option value="">-- Select a Tag --</option>
+        @foreach (var tag in tagsList)
+        {
+            <option value="@tag">@tag</option>
+        }
+    </select>
 
     <label for="desc">Note:</label>
     <textarea placeholder="Enter your note" @bind="note"></textarea>
@@ -43,6 +49,8 @@
 
     public string message;
 
+    TagManagement tagManagement = new TagManagement();
+    private List<string> tagsList = new();
     DatabaseValueInsertion databaseValueInsertion = new DatabaseValueInsertion();
 
     public void AddUserExpense()
@@ -59,5 +67,10 @@
             message = "Not enough balance.";
         }
 
+    }
+
+    protected override void OnInitialized()
+    {
+        tagsList = tagManagement.GetTagList();
     }
 }

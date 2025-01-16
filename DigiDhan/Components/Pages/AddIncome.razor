@@ -1,6 +1,17 @@
 ﻿@page "/income"
 
 <h3>Income</h3>
+@if (numDebt > 0)
+{
+    <div>
+        <p>You have a total of @numDebt pending debts. Please clear them first !!!</p>
+    </div>
+}
+else
+{
+    <p>You have no pending debts.</p>
+}
+
 <div>
     <label for="amount">Amount:</label>
     <input type="number" placeholder="Enter the amount" @bind="_amount" required />
@@ -12,7 +23,13 @@
     <input type="date" @bind="_date" required />
 
     <label for="tags">Tags:</label>
-    <input type="text" @bind="_tags" />
+    <select @bind="_tags">
+        <option value="">-- Select a Tag --</option>
+        @foreach (var tag in tagsList)
+        {
+            <option value="@tag">@tag</option>
+        }
+    </select>
 
     <label for="desc">Note:</label>
     <textarea placeholder="Enter your note" @bind="_note"></textarea>
@@ -35,11 +52,27 @@
     public String _tags;
     public String _note;
     public IncomeType _type;
+    public int numDebt;
 
     DatabaseValueInsertion databaseValueInsertion = new DatabaseValueInsertion();
+    DebtManagement debtManagement = new DebtManagement();
+    TagManagement tagManagement = new TagManagement();
+    private List<string> tagsList = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        numDebt = debtManagement.CheckNumberOfPendingDebt();
+    }
+
     public void AddUserIncome()
     {
         databaseValueInsertion.InsertIncome(_amount, _source, _date, _tags, _note, _type);
+        _amount = debtManagement.ClearPendingDebt(_amount);
         databaseValueInsertion.UpdateUserBalance(1, _amount);
+    }
+
+    protected override void OnInitialized()
+    {
+        tagsList = tagManagement.GetTagList();
     }
 }
