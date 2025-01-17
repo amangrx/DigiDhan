@@ -25,6 +25,7 @@ public class DebtManagement
         return numberOfPendingDebt;
     }
 
+    //function to clear the pending debt 
     public int ClearPendingDebt(int amount)
     {
         //query for getting outstanding amount

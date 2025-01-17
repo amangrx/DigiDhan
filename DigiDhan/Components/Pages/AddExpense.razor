@@ -1,18 +1,26 @@
 ﻿@page "/expenses"
 
-<h3>Expenses</h3>
-<div>
+<h3 class="header">Add your Expenses</h3>
+
+<div class="form-container">
+
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <div class="message">@message</div>
+    }
+
+    <!-- Input Fields -->
     <label for="amount">Amount:</label>
-    <input type="number" placeholder="Enter the amount" @bind="amount" required />
+    <input type="number" class="input-box" placeholder="Enter the amount" @bind="amount" required />
 
     <label for="source">Source:</label>
-    <input type="text" @bind="source" required />
+    <input type="text" class="input-box" placeholder="Enter the source" @bind="source" required />
 
     <label for="date">Date:</label>
-    <input type="date" @bind="date" required />
+    <input type="date" class="input-box" @bind="date" required />
 
     <label for="tags">Tags:</label>
-    <select @bind="tags">
+    <select class="input-box" @bind="tags">
         <option value="">-- Select a Tag --</option>
         @foreach (var tag in tagsList)
         {
@@ -21,28 +29,23 @@
     </select>
 
     <label for="desc">Note:</label>
-    <textarea placeholder="Enter your note" @bind="note"></textarea>
+    <textarea class="input-box" placeholder="Enter your note" @bind="note"></textarea>
 
     <label for="type">Type</label>
-    <select @bind="type">
+    <select class="input-box" @bind="type">
         @foreach (var type in Enum.GetNames(typeof(ExpenseType)))
         {
             <option value="@type">@type</option>
         }
     </select>
 
-    <button @onclick="AddUserExpense">Add expense</button>
-
+    <button class="add-expense-btn" @onclick="AddUserExpense">Add expense</button>
 </div>
-@if (!string.IsNullOrEmpty(message))
-{
-    <div class="message">@message</div>
-}
 
 @code {
     public int amount;
     public String source;
-    public DateOnly date;
+    public DateOnly date = DateOnly.FromDateTime(DateTime.Today);
     public String tags;
     public String note;
     public ExpenseType type;
@@ -50,13 +53,14 @@
     public string message;
 
     TagManagement tagManagement = new TagManagement();
-    private List<string> tagsList = new();
+    private List<string> tagsList = new List<string>();
     DatabaseValueInsertion databaseValueInsertion = new DatabaseValueInsertion();
 
+    // Method to add user expense
     public void AddUserExpense()
     {
         DatabaseExtraction databaseExtraction = new DatabaseExtraction();
-        if(databaseExtraction.GetUserBalance(1) >= amount)
+        if (databaseExtraction.GetUserBalance(1) >= amount)
         {
             databaseValueInsertion.InsertExpense(amount, source, date, tags, note, type);
             databaseValueInsertion.DeductUserBalance(1, amount);
@@ -66,9 +70,9 @@
         {
             message = "Not enough balance.";
         }
-
     }
 
+    // Method to extract tag list
     protected override void OnInitialized()
     {
         tagsList = tagManagement.GetTagList();

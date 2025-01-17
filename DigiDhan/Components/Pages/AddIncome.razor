@@ -1,29 +1,34 @@
 ﻿@page "/income"
 
-<h3>Income</h3>
+<h3 class="header">Income</h3>
 @if (numDebt > 0)
 {
-    <div>
+    <div class="alert">
         <p>You have a total of @numDebt pending debts. Please clear them first !!!</p>
     </div>
 }
 else
 {
-    <p>You have no pending debts.</p>
+    <p class="no-debt">You have no pending debts.</p>
 }
 
-<div>
+<div class="form-container">
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <div class="message">@message</div>
+    }
+
     <label for="amount">Amount:</label>
-    <input type="number" placeholder="Enter the amount" @bind="_amount" required />
+    <input type="number" class="input-box" placeholder="Enter the amount" @bind="_amount" required />
 
     <label for="source">Source:</label>
-    <input type="text" @bind="_source" required />
+    <input type="text" class="input-box" placeholder="Enter the source" @bind="_source" required />
 
     <label for="date">Date:</label>
-    <input type="date" @bind="_date" required />
+    <input type="date" class="input-box" @bind="_date" required />
 
     <label for="tags">Tags:</label>
-    <select @bind="_tags">
+    <select class="input-box" @bind="_tags">
         <option value="">-- Select a Tag --</option>
         @foreach (var tag in tagsList)
         {
@@ -32,45 +37,50 @@ else
     </select>
 
     <label for="desc">Note:</label>
-    <textarea placeholder="Enter your note" @bind="_note"></textarea>
+    <textarea class="input-box" placeholder="Enter your note" @bind="_note"></textarea>
 
-    <label for="type">Type</label>
-    <select @bind="_type">
+    <label for="type">Type:</label>
+    <select class="input-box" @bind="_type">
         @foreach (var type in Enum.GetNames(typeof(IncomeType)))
         {
             <option value="@type">@type</option>
         }
     </select>
 
-    <button @onclick="AddUserIncome">Add income</button>
-
+    <button class="add-income-btn" @onclick="AddUserIncome">Add income</button>
 </div>
+
 @code {
     public int _amount;
     public String _source;
-    public DateOnly _date;
+    public DateOnly _date = DateOnly.FromDateTime(DateTime.Today);
     public String _tags;
     public String _note;
     public IncomeType _type;
     public int numDebt;
+    private string message;
 
     DatabaseValueInsertion databaseValueInsertion = new DatabaseValueInsertion();
     DebtManagement debtManagement = new DebtManagement();
     TagManagement tagManagement = new TagManagement();
-    private List<string> tagsList = new();
+    private List<string> tagsList = new List<string>();
 
+    // Method to check number of pending debt
     protected override async Task OnInitializedAsync()
     {
         numDebt = debtManagement.CheckNumberOfPendingDebt();
     }
 
+    // Method to add user income
     public void AddUserIncome()
     {
         databaseValueInsertion.InsertIncome(_amount, _source, _date, _tags, _note, _type);
         _amount = debtManagement.ClearPendingDebt(_amount);
         databaseValueInsertion.UpdateUserBalance(1, _amount);
+        message = "Income added successfully!";
     }
 
+    // Method to add tag list
     protected override void OnInitialized()
     {
         tagsList = tagManagement.GetTagList();

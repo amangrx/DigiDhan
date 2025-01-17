@@ -1,26 +1,37 @@
 ﻿@page "/tags"
-<h3>AddTags</h3>
-<div>
-    <div>
-        <label for="tags">
-            Tag name:
-        </label>
-        <input type="text" @bind="_tagName" placeholder="Enter the tag name" required />
-    </div>
-    <div>
-        <button @onclick="CreateCustomTag">
-            Add tag
-        </button>
+<div class="container">
+    <h3 class="header">Create your own tags:</h3>
+    <div class="form-box">
+        <div class="form-group">
+            @if (!string.IsNullOrEmpty(message))
+            {
+                <div class="message">@message</div>
+            }
+
+            <label for="tags" class="label">
+                Tag name:
+            </label>
+            <input type="text" @bind="_tagName" class="input" placeholder="Enter the tag name" required />
+        </div>
+        <div>
+            <button class="btn" @onclick="CreateCustomTag">
+                Add tag
+            </button>
+        </div>
     </div>
 </div>
 
 @code {
-    public string _tagName;
-
+    public string _tagName;//declaring a string variable
+    public string message;
+    //creating an object of database value insertion class
     private DatabaseValueInsertion databaseValueInsertion = new DatabaseValueInsertion();
 
+    //function to create custom tag
     public void CreateCustomTag()
     {
-        databaseValueInsertion.InsertTags(_tagName); 
+        //calling the inserttag function.
+        databaseValueInsertion.InsertTags(_tagName);
+        message = "Tag created successfully!";
     }
 }

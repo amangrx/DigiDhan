@@ -1,0 +1,87 @@
+﻿/* Center the form container */
+.form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Bold header styling */
+.header {
+    text-align: center;
+    font-weight: bold;
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Input fields and textarea styling */
+.input-box {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+/* Linear gradient button */
+.add-income-btn {
+    width: 100%;
+    padding: 10px;
+    margin-top: 15px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    background: linear-gradient(90deg, #59589A, #E0CDF2);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+    .add-income-btn:hover {
+        opacity: 0.9;
+    }
+
+/* Message styling */
+.message {
+    color: #4CAF50; /* Green for success */
+    font-size: 14px;
+    margin-top: 10px;
+    text-align: center;
+}
+
+/* Alert styling for pending debts */
+.alert {
+    background-color: #FFEBEB;
+    border: 1px solid #FF4D4D;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: center;
+    color: #FF0000;
+    font-weight: bold;
+}
+
+/* Styling for no pending debts message */
+.no-debt {
+    color: #4CAF50;
+    text-align: center;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+    .form-container {
+        width: 90%;
+    }
+}

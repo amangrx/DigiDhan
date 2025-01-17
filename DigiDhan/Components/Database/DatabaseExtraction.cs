@@ -6,14 +6,17 @@ public class DatabaseExtraction
     private SQLiteConnection conn;
     string database = "Data Source=E:\\ICP\\Year 3\\Autumn\\Data and web development\\DigiDhan\\DigiDhan\\digidhan.db;Version=3;";
 
+    // Constructor that initializes the SQLite connection and opens it.
     public DatabaseExtraction()
     {
         conn = new SQLiteConnection(database);
         conn.Open();
     }
 
+    // Fetches the balance for user based on their user ID.
     public int GetUserBalance(int userId)
     {
+        //query to get details from users. 
         string userBalanceQuery = "SELECT * FROM users WHERE user_id = @userId;";
 
         using (var cmd = new SQLiteCommand(userBalanceQuery, conn))
@@ -31,6 +34,7 @@ public class DatabaseExtraction
         }
     }
 
+    // Retrieves the total number of transactions across incomes, expenses, and debts.
     public int GetNumberTransaction()
     {
         int totalNumberOfTransaction = 0;
@@ -60,10 +64,12 @@ public class DatabaseExtraction
         return totalNumberOfTransaction;
     }
 
+    // Fetches a list of all transactions (income, expenses, and debts) with their details.
     public List<Transaction> GetTransactions()
     {
         List<Transaction> transactions = new List<Transaction>();
 
+        //Retrieve income transactions
         string incomeQuery = "SELECT amount, source, date, tags, note, type FROM incomes";
         using (var cmd = new SQLiteCommand(incomeQuery, conn))
         {
@@ -83,7 +89,7 @@ public class DatabaseExtraction
             }
         }
 
-        // Retrieve Expense Transactions
+        // Retrieve expense transactions
         string expenseQuery = "SELECT exp_amount, exp_source, exp_date, tags, note, exp_type FROM expenses";
         using (var cmd = new SQLiteCommand(expenseQuery, conn))
         {
@@ -92,7 +98,7 @@ public class DatabaseExtraction
                 while (reader.Read())
                 {
                     var type = Enum.Parse<ExpenseType>(reader.GetString(5));
-                    transactions.Add(new Transaction("Expense",
+                    transactions.Add(new Transaction("Expenses",
                         reader.GetInt32(0),
                         reader.GetString(1),
                         DateOnly.Parse(reader.GetString(2)),
@@ -103,7 +109,7 @@ public class DatabaseExtraction
             }
         }
 
-        // Retrieve Debt Transactions
+        // Retrieve debt transactions
         string debtQuery = "SELECT debt_amount, debt_source, debt_date, tags, note, debt_type FROM debt";
         using (var cmd = new SQLiteCommand(debtQuery, conn))
         {
@@ -112,7 +118,7 @@ public class DatabaseExtraction
                 while (reader.Read())
                 {
                     var type = Enum.Parse<DebtType>(reader.GetString(5));
-                    transactions.Add(new Transaction("Debt",
+                    transactions.Add(new Transaction("Debts",
                         reader.GetInt32(0), reader.GetString(1),
                         DateOnly.Parse(reader.GetString(2)),
                         reader.GetString(3),
@@ -125,8 +131,10 @@ public class DatabaseExtraction
         return transactions;
     }
 
+    // Retrieves all transactions sorted by date across incomes, expenses, and debts.
     public List<Transaction> SortByDate()
     {
+        // Initializes an empty list to store transaction objects. 
         List<Transaction> transactions = new List<Transaction>();
 
         string sortQuery = @"
@@ -198,25 +206,36 @@ public class DatabaseExtraction
         return transactions;
     }
 
-    public List<Transaction> SearchBySpecificDateRange(DateOnly startDate, DateOnly endDate)
+    // Searches for transactions within a specific date range and matching the given filters.
+    public List<Transaction> SearchByFilterAndSpecificDateRange(String title, IncomeType incType, ExpenseType expType, DebtType debType, DateOnly startDate, DateOnly endDate)
     {
         List<Transaction> transactions = new List<Transaction>();
         string specificDateQuery = @"
             SELECT 'Income' as category, amount, source, date, tags, note, type 
             FROM incomes 
-            WHERE date BETWEEN @startDate AND @endDate
+            WHERE source LIKE CONCAT('%', @title, '%')
+            AND type LIKE CONCAT('%', @incType, '%')
+            AND date BETWEEN @startDate AND @endDate
             UNION ALL
             SELECT 'Expenses' as category, exp_amount, exp_source, exp_date, tags, note, exp_type
             FROM expenses
-            WHERE exp_date BETWEEN @startDate AND @endDate
+            WHERE exp_source LIKE CONCAT('%', @title, '%')
+            AND exp_type LIKE CONCAT('%', @expType, '%')
+            AND exp_date BETWEEN @startDate AND @endDate
             UNION ALL
             SELECT 'Debts' as category, debt_amount, debt_source, debt_date, tags, note, debt_type
             FROM debt
-            WHERE debt_date BETWEEN @startDate AND @endDate
+            WHERE debt_source LIKE CONCAT('%', @title, '%')
+            AND debt_type LIKE CONCAT('%', @debType, '%')
+            AND debt_date BETWEEN @startDate AND @endDate
             ORDER BY date;";
 
         using (var cmd = new SQLiteCommand(specificDateQuery, conn))
         {
+            cmd.Parameters.AddWithValue("@title", title);
+            cmd.Parameters.AddWithValue("@incType", incType.ToString());
+            cmd.Parameters.AddWithValue("@expType", expType.ToString());
+            cmd.Parameters.AddWithValue("@debType", debType.ToString());
             cmd.Parameters.AddWithValue("@startDate", startDate.ToString("yyyy-MM-dd"));
             cmd.Parameters.AddWithValue("@endDate", endDate.ToString("yyyy-MM-dd"));
 
@@ -276,6 +295,7 @@ public class DatabaseExtraction
         return transactions;
     }
 
+    // Gets the highest amount 
     public int GetHighest(string tableName)
     {
         string query = $"SELECT MAX(amount) FROM {tableName}";
@@ -290,6 +310,7 @@ public class DatabaseExtraction
         }
     }
 
+    // Gets the lowest amount 
     public int GetLowest(string tableName)
     {
         string query = $"SELECT MIN(amount) FROM {tableName}";
@@ -304,6 +325,7 @@ public class DatabaseExtraction
         }
     }
 
+    // Calculate the total amount 
     public int GetTotal(string tableName)
     {
         string query = $"SELECT SUM(amount) FROM {tableName}";
@@ -318,6 +340,7 @@ public class DatabaseExtraction
         }
     }
 
+    // Calculates the total amount of debts for a specific debt type 
     public int GetPendingAndClearedTotal(string debtType)
     {
         string query = $"SELECT SUM(debt_amount) FROM debt WHERE debt_type= '{debtType}';";

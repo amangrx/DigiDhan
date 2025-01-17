@@ -1,57 +1,65 @@
-﻿@page "/"
+﻿<!-- Login Page -->
+@page "/"
 @inject NavigationManager NavManager
 
-<!-- -->
-<h3>Login</h3>
-<div name="right-container">
-    <div>
-        <label for="username">Username:</label>
-        <input type="text" placeholder="Enter your username" @bind="username" required />
-
+<div class="container">
+    <div class="left-container">
+        <img src="images/logo.jpg" alt="Finance Tracker" class="image" />
     </div>
-    <div>
-        <label for="password">Password:</label>
-        <input type="password" placeholder="Enter your password" @bind="password" required />
-
+    <div class="right-container">
+        <h3>Digi Dhan</h3>
+        <p>Your personal finance tracker</p>
+        <!--Bad credentials message on giving incorrect username and password-->
+        @if (!string.IsNullOrEmpty(message))
+        {
+            <div class="message">@message</div>
+        }
+        <div>
+            <label for="username">Username:</label>
+            <input type="text" placeholder="Enter your username" @bind="username" required />
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" placeholder="Enter your password" @bind="password" required />
+        </div>
+        <!--Getting the names of the currency enum to display -->
+        <div>
+            <label for="Currency">Currency:</label>
+            <select id="currencyType" @bind="selectedCurrency" required>
+                @foreach (var currency in Enum.GetNames(typeof(Currency)))
+                {
+                    <option value="@currency">@currency</option>
+                }
+            </select>
+        </div>
+        <button @onclick="CheckLogin">Log In</button>
     </div>
-    <div>
-        <label for="Currency">Currency:</label>
-        <select id="currencyType" @bind="selectedCurrency" required>
-            @foreach (var currency in Enum.GetNames(typeof(Currency)))
-            {
-                <option value="@currency">@currency</option>
-            }
-        </select>
-    </div>
-
-    <button @onclick="CheckLogin">Log In</button>
 </div>
 
 
 @code {
+    //Declaring variables. 
     public String username;
     public String password;
     public Currency selectedCurrency = Currency.NPR;
+    public string message;
 
+    //method to log the user into the application
     public void CheckLogin()
     {
-        Console.WriteLine("ahohoho");
         if (username.Equals("amngrx") && password.Equals("aman123"))
         {
-            // UserLogin.isLoggedIn = true; 
-
-            //Initializing the object of database connection to call for the 
+            //Initializing the object of database connection to call for the
             //function that checks for existing database and creates new database when there is no existing databas
             DatabaseConnection databaseConnection = new DatabaseConnection();
             databaseConnection.CheckForExistingDatabase();
-
-            //Navigating to home page. 
+            //Navigating to home page.
             NavManager.NavigateTo("/home");
-            StateHasChanged();
         }
         else
         {
-            Console.WriteLine("Bad Credentials.");
+            //Message in case of incorrect credentials. 
+            message = "You have provided incorrect credentials!";
         }
     }
 }

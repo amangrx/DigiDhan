@@ -11,6 +11,7 @@ public class TagManagement
         conn.Open();
     }
 
+    //function to get the tag list
     public List<string> GetTagList()
     {
         List<string> tagList = new List<string>();

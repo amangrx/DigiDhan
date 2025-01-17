@@ -1,82 +1,81 @@
 ﻿@page "/home"
 
-<h1>Digi Dhan</h1>
-<p> Total Transaction: @totalNumberTransaction</p>
-<p> Current Balance: @currentBalance</p>
+<h1 class="header">Digi Dhan</h1>
+<div class="summary-box">
+    <p>Total Transaction: <strong>@totalNumberTransaction</strong></p>
+    <p>Current Balance: <strong>@currentBalance</strong></p>
+</div>
+
+<!--Cards for income, expense and debt-->
 <div class="cards-container">
-    <div class="card">
+    <div class="card income-card">
         <h2>Income</h2>
         <p>Highest: @highestIncome</p>
         <p>Lowest: @lowestIncome</p>
         <hr />
-        <p>Total:@totalIncome</p>
+        <p>Total: @totalIncome</p>
     </div>
-    <div class="card">
+    <div class="card expense-card">
         <h2>Expense</h2>
         <p>Highest: @highestExpense</p>
         <p>Lowest: @lowestExpense</p>
         <hr />
-        <p>Total:@totalExpense </p>
+        <p>Total: @totalExpense</p>
     </div>
-    <div class="card">
+    <div class="card debt-card">
         <h2>Debt</h2>
         <p>Highest: @highestDebt</p>
         <p>Lowest: @lowestDebt</p>
         <hr />
-        <p>Remaining Debt:@totalPendingDebt </p>
-        <p>Cleared Debt @totalClearedDebt</p>
+        <p>Remaining Debt: @totalPendingDebt</p>
+        <p>Cleared Debt: @totalClearedDebt</p>
         <p>Total: @totalDebt</p>
     </div>
 </div>
 
-<button class="submit-btn" @onclick="SortByDate" type="submit">Sort Date</button>
-<p>@searchByDateFrom</p>
-<p>@searchByDateTo</p>
-<!--For specifying transactions of certain date-->
-<div>
-    <label>From: </label>
-    <input type="date" @bind="searchByDateFrom" />
+<!--Advance search filter-->
+<h3 class="header">Advance search with filtering:</h3>
+<div class="filter-box">
+    <!--Input fields for filtering-->
+    <input class="input-field" type="text" @bind="title" placeholder="Search for a source">
+    <input class="input-field" type="date" @bind="searchByDateFrom" placeholder="Date">
+    <input class="input-field" type="date" @bind="searchByDateTo" placeholder="Date">
+    <!--Input field for income-->
+    <select class="input-field" @bind="incomeType">
+        @foreach (var type in Enum.GetNames(typeof(IncomeType)))
+        {
+            <option value="@type">@type</option>
+        }
+    </select>
+    <!--Input field for expenses-->
+    <select class="input-field" @bind="expType">
+        @foreach (var type in Enum.GetNames(typeof(ExpenseType)))
+        {
+            <option value="@type">@type</option>
+        }
+    </select>
+    <!--Input field for debt-->
+    <select class="input-field" @bind="debtType">
+        @foreach (var type in Enum.GetNames(typeof(DebtType)))
+        {
+            <option value="@type">@type</option>
+        }
+    </select>
+    <!--Input field for tags-->
+    <select class="input-field" @bind="tags">
+        <option value="">-- Select a Tag --</option>
+        @foreach (var tag in tagsList)
+        {
+            <option value="@tag">@tag</option>
+        }
+    </select>
+    <button class="submit-btn" @onclick="SearchByFilter">Search</button>
 </div>
-<div>
-    <label>To: </label>
-    <input type="date" @bind="searchByDateTo" />
-</div>
-<button class="submit-btn" @onclick="SpecifyByDate" type="submit">Search</button>
 
-<style>
-    .cards-container {
-        display: flex;
-        gap: 20px;
-        margin: 20px 0;
-    }
-
-    .card {
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 16px;
-        width: 200px;
-        text-align: center;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    th, td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-    }
-
-    th {
-        background-color: #f2f2f2;
-        font-weight: bold;
-    }
-</style>
-
-<table>
+<!--Displaying the transactions-->
+<h3 class="header">Transaction details:</h3>
+<button class="submit-btn" @onclick="SortByDate">Sort all transaction by date</button>
+<table class="transaction-table">
     <thead>
         <tr>
             <th>Category</th>
@@ -89,6 +88,7 @@
         </tr>
     </thead>
     <tbody>
+        <!--Using for each loop to display the transactions in the list-->
         @foreach (var transaction in transaction)
         {
             <tr>
@@ -103,7 +103,7 @@
                     {
                         @transaction.incomeType
                     }
-                    else if (transaction.category == "Expense")
+                    else if (transaction.category == "Expenses")
                     {
                         @transaction.expenseType
                     }
@@ -111,11 +111,11 @@
                     {
                         @if (transaction.debtType == DebtType.Pending)
                         {
-                            <span style="background-color: red; color: white; padding: 5px;">@transaction.debtType.ToString()</span>
+                            <span class="pending-debt">@transaction.debtType.ToString()</span>
                         }
                         else
                         {
-                            <span style="background-color: darkgreen; color: white; padding: 5px;">@transaction.debtType.ToString()</span>
+                            <span class="cleared-debt">@transaction.debtType.ToString()</span>
                         }
                     }
                 </td>
@@ -124,10 +124,14 @@
     </tbody>
 </table>
 
-
 @code {
+    //Instance of required classes.
     private List<Transaction> transaction = new List<Transaction>();
     private DatabaseExtraction databaseExtraction = new DatabaseExtraction();
+    private TagManagement tagManagement = new TagManagement();
+    private List<string> tagsList = new List<string>();
+
+    //initializing the variables to 0 for calculations. 
     private int currentBalance = 0;
     private int highestIncome = 0;
     private int lowestIncome = 0;
@@ -145,19 +149,28 @@
     private int totalClearedDebt = 0;
 
     // variable for dashboard filtering by specific date range.
-    private DateOnly searchByDateFrom;
-    private DateOnly searchByDateTo;
+    private String title;
+    private IncomeType incomeType;
+    private ExpenseType expType;
+    private DebtType debtType;
+    private DateOnly searchByDateFrom = DateOnly.FromDateTime(DateTime.Today);
+    private DateOnly searchByDateTo = DateOnly.FromDateTime(DateTime.Today);
+    private String tags;
 
+    //Calls the function that sorts the transaction according to date. 
     public void SortByDate()
     {
         transaction = databaseExtraction.SortByDate();
     }
 
-    public void SpecifyByDate()
+    //Calls the function that applies the advance filtering and searching 
+    public void SearchByFilter()
     {
-        transaction = databaseExtraction.SearchBySpecificDateRange(searchByDateFrom, searchByDateTo);
+        transaction = databaseExtraction.SearchByFilterAndSpecificDateRange(title, incomeType, expType, debtType, searchByDateFrom, searchByDateTo);
     }
 
+    // Initializes the component by fetching transactions, transaction count, user balance and calls the function
+    // that calculates highest, lowest, and total values.
     protected override async Task OnInitializedAsync()
     {
         transaction = databaseExtraction.GetTransactions();
@@ -167,6 +180,7 @@
         FetchTotal();
     }
 
+    //Calls the method that gets the highest and lowest and assigns the value. 
     private void FetchHighestAndLowestValues()
     {
         highestIncome = databaseExtraction.GetHighest("incomes");
@@ -179,6 +193,7 @@
         lowestDebt = databaseExtraction.GetLowest("debt");
     }
 
+    //Calls the function that total amount of income, expense and debt
     private void FetchTotal()
     {
         totalIncome = databaseExtraction.GetTotal("incomes");
@@ -188,4 +203,9 @@
         totalClearedDebt = databaseExtraction.GetPendingAndClearedTotal("Cleared");
     }
 
+    // Fetches and initializes the list of tags during component initialization.
+    protected override void OnInitialized()
+    {
+        tagsList = tagManagement.GetTagList();
+    }
 }

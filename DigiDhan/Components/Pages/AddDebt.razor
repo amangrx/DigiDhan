@@ -1,21 +1,27 @@
 ﻿@page "/debt"
 
-<h3>Debt</h3>
-<div>
+<h3 class="header">Add your Debts</h3>
+<div class="form-container">
+    <!-- Success or error message -->
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <p class="message">@message</p>
+    }
+    <!-- Input Fields -->
     <label for="amount">Amount:</label>
-    <input type="number" placeholder="Enter the amount" @bind="debtAmount" required />
+    <input type="number" class="input-box" placeholder="Enter the amount" @bind="debtAmount" required />
 
     <label for="source">Source:</label>
-    <input type="text" @bind="debtSource" required />
+    <input type="text" class="input-box" placeholder="Enter the source" @bind="debtSource" required />
 
     <label for="date">Date:</label>
-    <input type="date" @bind="debtDate" required />
+    <input type="date" class="input-box" @bind="debtDate" required />
 
     <label for="dueDate">Due Date:</label>
-    <input type="date" @bind="debtDueDate" required />
+    <input type="date" class="input-box" @bind="debtDueDate" required />
 
     <label for="tags">Tags:</label>
-    <select @bind="tags">
+    <select class="input-box" @bind="tags">
         <option value="">-- Select a Tag --</option>
         @foreach (var tag in tagsList)
         {
@@ -24,40 +30,34 @@
     </select>
 
     <label for="desc">Note:</label>
-    <textarea placeholder="Enter your note" @bind="note"></textarea>
+    <textarea class="input-box" placeholder="Enter your note" @bind="note"></textarea>
 
-    <label for="type">Type</label>
-    <select @bind="debtType">
-        @foreach (var type in Enum.GetNames(typeof(DebtType)))
-        {
-            <option value="@type">@type</option>
-        }
-    </select>
-
-    <button @onclick="AddUserDebt">Add debt</button>
-
+    <button class="add-debt-btn" @onclick="AddUserDebt">Add debt</button>
 </div>
 
-
 @code {
+    // Declaring the variables
     public int debtAmount;
     public String debtSource;
-    public DateOnly debtDate;
-    public DateOnly debtDueDate;
+    public DateOnly debtDate = DateOnly.FromDateTime(DateTime.Today);
+    public DateOnly debtDueDate = DateOnly.FromDateTime(DateTime.Today);
     public String tags;
     public String note;
-    public DebtType debtType;
-    private List<string> tagsList = new();
-
+    public DebtType debtType = DebtType.Pending;
+    private List<string> tagsList = new List<string>();
+    private string message;
     TagManagement tagManagement = new TagManagement();
     DatabaseValueInsertion databaseValueInsertion = new DatabaseValueInsertion();
 
+    //method to add user debt
     public void AddUserDebt()
     {
         databaseValueInsertion.InsertDebt(debtAmount, debtSource, debtDate, debtDueDate, tags, note, debtType);
         databaseValueInsertion.UpdateUserBalance(1, debtAmount);
+        message = "Debt has been added successfully!";
     }
 
+    //method to get tag list. 
     protected override void OnInitialized()
     {
         tagsList = tagManagement.GetTagList();

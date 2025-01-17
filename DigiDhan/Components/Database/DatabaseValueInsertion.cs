@@ -44,6 +44,7 @@ public class DatabaseValueInsertion
         return (int)lastInsertId;
     }
 
+    //function to insert the values of exxpense to the database.
     public void InsertExpense(int amount, string source, DateOnly date, string tags, string note, ExpenseType type)
     {
         string insertExpenseQuery = "INSERT INTO expenses (exp_amount, exp_source, exp_date, tags, note, exp_type) VALUES (@amount, @source, @date, @tags, @note, @type)";
@@ -58,6 +59,8 @@ public class DatabaseValueInsertion
             cmd.ExecuteNonQuery();
         }
     }
+
+    //function to insert the values of debt to the database.
     public void InsertDebt(int amount, string source, DateOnly date, DateOnly dueDate, string tags, string note, DebtType debtType)
     {
         string insertDebtQuery = "INSERT INTO debt (debt_amount, outstanding_amt, debt_source, debt_date, due_date, tags, note, debt_type) VALUES (@amount, @outstanding_amt, @source, @date, @dueDate, @tags, @note, @type)";
@@ -75,6 +78,7 @@ public class DatabaseValueInsertion
         }
     }
 
+    //function to insert the values of tags to the database.
     public void InsertTags(string tag_name)
     {
         string insertTagQuery = "INSERT INTO tags(tag_name) VALUES (@tag_name)";
@@ -85,7 +89,7 @@ public class DatabaseValueInsertion
         }
     }
 
-
+    //function to update the balance 
     public void UpdateUserBalance(int userId, int amount)
     {
         string updateUserBalanceQuery = "UPDATE users SET balance = balance + @amount WHERE user_id = @userId";
@@ -98,6 +102,7 @@ public class DatabaseValueInsertion
         }
     }
 
+    //function to deduct the balance
     public void DeductUserBalance(int userId, int amount)
     {
         string deductUserBalanceQuery = "UPDATE users SET balance = balance - @amount WHERE user_id = @userId";
